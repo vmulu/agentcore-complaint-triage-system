@@ -2,7 +2,7 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 from langgraph.checkpoint.memory import InMemorySaver
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
-from model.load import load_model
+from model.load import get_model
 
 app = BedrockAgentCoreApp()
 
@@ -18,7 +18,7 @@ def add_numbers(a: int, b: int) -> int:
 tools = [add_numbers]
 
 agent = create_agent(
-    model=load_model(),
+    model=get_model(),
     tools=tools,
     system_prompt=SYSTEM_PROMPT,
     checkpointer=InMemorySaver(),

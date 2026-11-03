@@ -1,9 +1,21 @@
-from langchain.chat_models import init_chat_model
-from langchain_core.language_models import BaseChatModel
+from langchain_aws import ChatBedrockConverse #converse api
 
-MODEL_ID = "global.anthropic.claude-sonnet-5-5"
+from config import BEDROCK_MODEL_ID, BEDROCK_MAX_TOKENS, AWS_REGION
 
+def _load_model() -> ChatBedrockConverse:
+    """Build Bedrock chat model from environment variables."""
 
-def load_model() -> BaseChatModel:
-    """Get a Bedrock chat model using IAM credentials."""
-    return init_chat_model(MODEL_ID, model_provider="bedrock_converse")
+    return ChatBedrockConverse(
+        model=BEDROCK_MODEL_ID,
+        max_tokens=int(BEDROCK_MAX_TOKENS) if BEDROCK_MAX_TOKENS else None,
+        region_name=AWS_REGION
+    )
+
+# lazily load model so it is only ever instantiated when it is used
+_MODEL: ChatBedrockConverse | None = None
+
+def get_model() -> ChatBedrockConverse:
+    global _MODEL
+    if _MODEL is None:
+        _MODEL = _load_model()
+    return _MODEL
