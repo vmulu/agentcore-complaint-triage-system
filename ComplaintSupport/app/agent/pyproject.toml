@@ -15,6 +15,7 @@ dependencies = [
     "langchain-aws ~= 1.7.5",
     "langgraph ~= 1.2.11",
     "opentelemetry-instrumentation-langchain ~= 0.62.3",
+    "python-dotenv>=1.2.4",
 ]
 
 [tool.hatch.build.targets.wheel]

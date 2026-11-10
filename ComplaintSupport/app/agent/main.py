@@ -1,49 +1,24 @@
 from langchain.agents import create_agent
-from langchain.tools import tool
-from langgraph.checkpoint.memory import InMemorySaver
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from model.load import get_model
+from pydantic import ValidationError
+from schemas import InvokePayload
+from tools import lookup_policy, get_reply_format
+from prompts import SYSTEM_PROMPT, build_user_message
 
 app = BedrockAgentCoreApp()
 
-SYSTEM_PROMPT = "You are a helpful assistant. Use tools when appropriate."
-
-
-@tool
-def add_numbers(a: int, b: int) -> int:
-    """Return the sum of two numbers"""
-    return a + b
-
-
-tools = [add_numbers]
-
-agent = create_agent(
-    model=get_model(),
-    tools=tools,
-    system_prompt=SYSTEM_PROMPT,
-    checkpointer=InMemorySaver(),
-)
-
+agent = create_agent(get_model(), tools=[lookup_policy, get_reply_format],
+                     system_prompt=SYSTEM_PROMPT)
 
 @app.entrypoint
-async def invoke(payload, context):
-    prompt = payload.get("prompt") if isinstance(payload, dict) else None
-    if not isinstance(prompt, str) or not prompt:
-        yield {"error": "payload must be a JSON object with a non-empty string 'prompt'"}
-        return
-
-    session_id = context.session_id or "default-session"
-    config = {"configurable": {"thread_id": session_id}}
-
-    async with await agent.astream_events(
-        {"messages": [{"role": "user", "content": prompt}]},
-        config,
-        version="v3",
-    ) as stream:
-        async for message in stream.messages:
-            blocks = (await message.output).content_blocks
-            if blocks:
-                yield {"node": message.node, "content": blocks}
+def invoke(payload: dict) -> dict:
+    try:
+        data = InvokePayload.model_validate(payload)
+    except ValidationError as e:
+        return {"error": "invalid_payload", "details": e.errors()}
+    result = agent.invoke({"messages": [{"role": "user", "content": build_user_message(data)}]})
+    return {"draft": result["messages"][-1].content}
 
 
 if __name__ == "__main__":

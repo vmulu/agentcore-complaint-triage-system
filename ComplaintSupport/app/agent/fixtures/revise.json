@@ -1,0 +1,9 @@
+{
+  "subject": "Power out for over a day on Elm Street",
+  "redacted_body": "Our power went out Saturday night around 9pm and did not come back until Monday afternoon. We lost everything in our fridge and freezer. I would like to know if we will be compensated for the outage. My account is [REDACTED].",
+  "channel": "email",
+  "sentiment": "NEGATIVE",
+  "priority": "medium",
+  "previous_draft": "Dear Customer,\n\nWe are so sorry for the inconvenience caused by the recent power outage on Elm Street. We understand how frustrating it is to lose power for an extended period.\n\nBecause your service was interrupted for more than 24 consecutive hours, you may be eligible for a prorated outage credit. Eligibility is confirmed once the outage is verified, and any credit is applied automatically to your next bill.\n\nIf you experience another outage, please call our 24-hour service line for status updates.\n\nSincerely,\nCustomer Support Team",
+  "staff_comment": "Drop the apology in the first sentence and just acknowledge the outage. Also tell them that food spoilage is handled as a damage claim and they should submit a claim form with receipts."
+}
